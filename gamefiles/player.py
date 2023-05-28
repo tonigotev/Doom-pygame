@@ -39,9 +39,8 @@ class Player:
             num_key_pressed += 1
             dx += -speed_sin
             dy += speed_cos
-
-        self.x += dx
-        self.y += dy
+        
+        self.check_wall_collision(dx, dy)
 
         if keys[pg.K_LEFT]:
             self.angle -= PLAYER_ROT_SPEED * self.game.frame_time
@@ -49,18 +48,14 @@ class Player:
             self.angle += PLAYER_ROT_SPEED * self.game.frame_time
         self.angle %= math.tau
 
-        # # diag move correction
-        # if num_key_pressed:
-        #     dx *= self.diag_move_corr
-        #     dy *= self.diag_move_corr
-
-        # self.check_wall_collision(dx, dy)
-
-        # # if keys[pg.K_LEFT]:
-        # #     self.angle -= PLAYER_ROT_SPEED * self.game.frame_time
-        # # if keys[pg.K_RIGHT]:
-        # #     self.angle += PLAYER_ROT_SPEED * self.game.frame_time
-        # self.angle %= math.tau
+    def check_wall(self, x, y):
+        return (x, y) not in self.game.map.walls
+    
+    def check_wall_collision(self, dx, dy):
+        if self.check_wall(int(self.x + dx), int(self.y)):
+            self.x += dx
+        if self.check_wall(int(self.x), int(self.y + dy)):
+            self.y += dy
 
     def draw(self):
         pg.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
@@ -71,6 +66,7 @@ class Player:
     def update(self):
         self.movement()
     
+
     @property
     def pos(self):
         return self.x, self.y
