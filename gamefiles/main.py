@@ -1,5 +1,6 @@
-from object_renderer import *
+from sprite import *
 from raycasting import RayCasting
+from object_renderer import *
 from player import Player
 from settings import *
 import pygame as pg
@@ -23,10 +24,12 @@ class Game():
         self.player = Player(self)
         self.object_renderer = ObjectRenderer(self)
         self.raycasting = RayCasting(self)
+        self.sprite = Sprite(self)
 
     def update(self):
         self.frame_time = self.clock.tick(FRAMES_PER_SECOND)
         pg.display.set_caption(f'{self.clock.get_fps()}')
+        self.sprite.update()
         self.raycasting.update()
         self.player.update()
         pg.display.flip()
