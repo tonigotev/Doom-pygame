@@ -6,8 +6,8 @@ import math
 class Player:
     def __init__(self, game):
         self.game = game
-        self.x, self.y = PLAYER_POS
-        self.angle = PLAYER_ANGLE
+        self.x, self.y = PLAYER_POSITION 
+        self.angle = PLAYER_VIEW_ANGLE
 
     def movement(self):
         keys = pg.key.get_pressed()
@@ -16,9 +16,9 @@ class Player:
         cos_a = math.cos(self.angle)
         dx, dy = 0, 0
         if keys[pg.K_LSHIFT]:
-            speed = PLAYER_SPEED * self.game.frame_time * 2
+            speed = PLAYER_MOVE_SPEED  * self.game.frame_time * 2
         else:
-            speed = PLAYER_SPEED * self.game.frame_time
+            speed = PLAYER_MOVE_SPEED  * self.game.frame_time
         speed_sin = speed * sin_a
         speed_cos = speed * cos_a
 
@@ -42,10 +42,10 @@ class Player:
         
         self.check_wall_collision(dx, dy)
 
-        if keys[pg.K_LEFT]:
-            self.angle -= PLAYER_ROT_SPEED * self.game.frame_time
-        if keys[pg.K_RIGHT]:
-            self.angle += PLAYER_ROT_SPEED * self.game.frame_time
+        # if keys[pg.K_LEFT]:
+        #     self.angle -= PLAYER_ROTATION_SPEED * self.game.frame_time
+        # if keys[pg.K_RIGHT]:
+        #     self.angle += PLAYER_ROTATION_SPEED * self.game.frame_time
         self.angle %= math.tau
 
     def check_wall(self, x, y):
@@ -57,13 +57,29 @@ class Player:
         if self.check_wall(int(self.x), int(self.y + dy)):
             self.y += dy
 
-    def draw(self):
-        pg.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
-                    (self.x * 100 + WIDTH * math.cos(self.angle),
-                    self.y * 100 + WIDTH * math. sin(self.angle)), 2)
-        pg.draw.circle(self.game.screen, 'green', (self.x * 100, self.y * 100), 15)
+    # def draw(self):
+        # pg.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
+        #             (self.x * 100 + WIDTH * math.cos(self.angle),
+        #             self.y * 100 + WIDTH * math. sin(self.angle)), 2)
+        # pg.draw.circle(self.game.screen, 'green', (self.x * 100, self.y * 100), 15)
+
+    def draw_crosshair(self):
+        pg.draw.line(self.game.screen, 'white', (WIDTH // 2 - 10, HEIGHT // 2),
+                    (WIDTH // 2 + 10, HEIGHT // 2), 2)
+        pg.draw.line(self.game.screen, 'white', (WIDTH // 2, HEIGHT // 2 - 10),
+                    (WIDTH // 2, HEIGHT // 2 + 10), 2)
+
+    # used a random website for that
+    def mouse_control(self):
+        mx, my = pg.mouse.get_pos()
+        if mx < MOUSE_BORDER_LEFT or mx > MOUSE_BORDER_RIGHT:
+            pg.mouse.set_pos([WIDTH // 2, HEIGHT // 2])
+        self.rel = pg.mouse.get_rel()[0]
+        self.rel = max(-MOUSE_MAX_MOVEMENT, min(MOUSE_MAX_MOVEMENT, self.rel))
+        self.angle += self.rel * MOUSE_SENSITIVITY * self.game.frame_time
     
     def update(self):
+        self.mouse_control()
         self.movement()
     
 
@@ -72,5 +88,5 @@ class Player:
         return self.x, self.y
     
     @property
-    def mapposition(self):
+    def map_position(self):
         return int(self.x), int(self.y)
