@@ -38,7 +38,7 @@ class GameObjectHandler:
             self.gameInstance.startNewGame()
 
     def updateGameState(self):
-        self.nonPlayerCharacterPositions = {nonPlayerCharacter.position for nonPlayerCharacter in self.nonPlayerCharacterList if nonPlayerCharacter.alive}
+        self.nonPlayerCharacterPositions = {nonPlayerCharacter.mapPosition for nonPlayerCharacter in self.nonPlayerCharacterList if nonPlayerCharacter.alive}
         [spriteObject.update() for spriteObject in self.spriteObjectsList]
         [nonPlayerCharacter.update() for nonPlayerCharacter in self.nonPlayerCharacterList]
         self.checkForWinCondition()

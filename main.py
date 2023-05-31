@@ -46,7 +46,7 @@ class VideoGame:
         pg.display.set_caption(f'{self.game_clock.get_fps() :.1f}')
 
     def game_draw(self):
-        self.objects.draw()
+        self.object_rendering_engine.draw()
         self.player_weapon.draw()
 
     def event_check(self):

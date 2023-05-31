@@ -31,7 +31,7 @@ class NPC(AnimatedSprite):
         # self.draw_ray_cast()
 
     def check_wall(self, x, y):
-        return (x, y) not in self.game.map.world_map
+        return (x, y) not in self.game.game_map.world_map
 
     def check_wall_collision(self, dx, dy):
         if self.check_wall(int(self.x + dx * self.size), int(self.y)):
@@ -40,11 +40,11 @@ class NPC(AnimatedSprite):
             self.y += dy
 
     def movement(self):
-        next_pos = self.game.pathfinding.get_path(self.mapPosition, self.game.player.mapPosition)
+        next_pos = self.game.path_finder.findPath(self.mapPosition, self.game.player.mapPosition)
         next_x, next_y = next_pos
 
         # pg.draw.rect(self.game.screen, 'blue', (100 * next_x, 100 * next_y, 100, 100))
-        if next_pos not in self.game.object_handler.npc_positions:
+        if next_pos not in self.game.handler.nonPlayerCharacterPositions:
             angle = math.atan2(next_y + 0.5 - self.y, next_x + 0.5 - self.x)
             dx = math.cos(angle) * self.speed
             dy = math.sin(angle) * self.speed
@@ -52,13 +52,13 @@ class NPC(AnimatedSprite):
 
     def attack(self):
         if self.animation_trigger:
-            self.game.sound.npc_shot.play()
+            self.game.game_sound.npc_shot.play()
             if random() < self.accuracy:
-                self.game.player.get_damage(self.attack_damage)
+                self.game.player.applyDamageToPlayer(self.attack_damage)
 
     def animate_death(self):
         if not self.alive:
-            if self.game.global_trigger and self.frame_counter < len(self.death_images) - 1:
+            if self.game.trigger and self.frame_counter < len(self.death_images) - 1:
                 self.death_images.rotate(-1)
                 self.image = self.death_images[0]
                 self.frame_counter += 1
@@ -69,18 +69,18 @@ class NPC(AnimatedSprite):
             self.pain = False
 
     def check_hit_in_npc(self):
-        if self.ray_cast_value and self.game.player.shot:
+        if self.ray_cast_value and self.game.player.isShooting:
             if HALF_SCREEN_WIDTH - self.sprite_half_width < self.screen_x < HALF_SCREEN_WIDTH + self.sprite_half_width:
-                self.game.sound.npc_pain.play()
-                self.game.player.shot = False
+                self.game.game_sound.npc_pain.play()
+                self.game.player.isShooting = False
                 self.pain = True
-                self.health -= self.game.weapon.damage
+                self.health -= self.game.player_weapon.damage
                 self.check_health()
 
     def check_health(self):
         if self.health < 1:
             self.alive = False
-            self.game.sound.npc_death.play()
+            self.game.game_sound.npc_death.play()
 
     def run_logic(self):
         if self.alive:
@@ -120,7 +120,7 @@ class NPC(AnimatedSprite):
         wall_dist_v, wall_dist_h = 0, 0
         player_dist_v, player_dist_h = 0, 0
 
-        ox, oy = self.game.player.position
+        ox, oy = self.game.player.mapPosition
         x_map, y_map = self.game.player.mapPosition
 
         ray_angle = self.theta
@@ -142,7 +142,7 @@ class NPC(AnimatedSprite):
             if tile_hor == self.mapPosition:
                 player_dist_h = depth_hor
                 break
-            if tile_hor in self.game.map.world_map:
+            if tile_hor in self.game.game_map.world_map:
                 wall_dist_h = depth_hor
                 break
             x_hor += dx
@@ -163,7 +163,7 @@ class NPC(AnimatedSprite):
             if tile_vert == self.mapPosition:
                 player_dist_v = depth_vert
                 break
-            if tile_vert in self.game.map.world_map:
+            if tile_vert in self.game.game_map.world_map:
                 wall_dist_v = depth_vert
                 break
             x_vert += dx
@@ -208,23 +208,3 @@ class CyberDemonNPC(NPC):
         self.attack_damage = 15
         self.speed = 0.055
         self.accuracy = 0.25
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

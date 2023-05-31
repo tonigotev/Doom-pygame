@@ -34,26 +34,29 @@ class PlayerController:
 
     def applyDamageToPlayer(self, damageValue):
         self.health -= damageValue
-        self.gameInstance.object_renderer.player_damage()
-        self.gameInstance.sound.player_pain.play()
+        self.gameInstance.object_rendering_engine.applyPlayerDamageOverlay()
+        self.gameInstance.game_sound.player_pain.play()
         self.checkGameOverCondition()
 
     def handleSingleFireEvent(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            if event.button == 1 and not self.isShooting and not self.gameInstance.player_weapon.isReloading:
-                self.gameInstance.sound.shotgun.play()
+            if event.button == 1 and not self.isShooting and not self.gameInstance.player_weapon.reloading:
+                self.gameInstance.game_sound.shotgun.play()
                 self.isShooting = True
                 self.gameInstance.player_weapon.isReloading = True
 
     def processPlayerMovement(self):
+        keyPressedStatus = pg.key.get_pressed()
         sinAngle = math.sin(self.viewingAngle)
         cosAngle = math.cos(self.viewingAngle)
         deltaPositionX, deltaPositionY = 0, 0
-        movementSpeed = PLAYER_MOVEMENT_SPEED * self.gameInstance.delta_time
+        if keyPressedStatus[pg.K_LSHIFT]:
+            movementSpeed = PLAYER_MOVEMENT_SPEED * self.gameInstance.delta_time * 2
+        else:
+            movementSpeed = PLAYER_MOVEMENT_SPEED * self.gameInstance.delta_time
         speed_sin = movementSpeed * sinAngle
         speed_cos = movementSpeed * cosAngle
 
-        keyPressedStatus = pg.key.get_pressed()
         numberOfKeysPressed = -1
         if keyPressedStatus[pg.K_w]:
             numberOfKeysPressed += 1

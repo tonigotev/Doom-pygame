@@ -32,7 +32,7 @@ class PathfindingEngine:
             adjacentNodes = graph[currentNode]
 
             for adjacentNode in adjacentNodes:
-                if adjacentNode not in visitedNodes and adjacentNode not in self.gameInstance.object_handler.npc_positions:
+                if adjacentNode not in visitedNodes and adjacentNode not in self.gameInstance.handler.nonPlayerCharacterPositions:
                     nodeQueue.append(adjacentNode)
                     visitedNodes[adjacentNode] = currentNode
         return visitedNodes
